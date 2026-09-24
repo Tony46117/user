@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Username Estate Properties — Land &amp; Plots for Sale in Kenya</title>
+  <meta name="description" content="Username Estate Properties — value-added land and plots for sale across Kenya. Nakuru, Ngong, Kikuyu, Juja, Kamakis, Matuu. 1/8 acre plots from KSHS 250,000.">
+  <link rel="icon" href="assets/main-logo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    :root {
+      --green: #3fae3f;
+      --green-dark: #2f8f2f;
+      --green-deep: #1f6b1f;
+      --red: #e02b2b;
+      --dark: #14210f;
+      --light: #f4f9f0;
+      --white: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ---------- Header ---------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--white);
+      box-shadow: 0 2px 14px rgba(0,0,0,.12);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; }
+    .brand img { height: 62px; width: auto; }
+    .header-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: var(--white);
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 15px;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .header-phone:hover { background: var(--green-dark); }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      min-height: 78vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background:
+        linear-gradient(rgba(20,33,15,.62), rgba(20,33,15,.62)),
+        url('assets/background.jpeg') center 30% / cover no-repeat;
+      color: var(--white);
+      padding: 70px 20px;
+    }
+    .hero-content { max-width: 860px; }
+    .hero h1 {
+      font-size: clamp(34px, 6vw, 62px);
+      font-weight: 800;
+      line-height: 1.12;
+      text-shadow: 0 3px 16px rgba(0,0,0,.5);
+    }
+    .hero h1 span { color: #7ee87e; }
+    .hero p {
+      margin: 18px auto 30px;
+      font-size: clamp(16px, 2.2vw, 21px);
+      max-width: 640px;
+      text-shadow: 0 2px 10px rgba(0,0,0,.5);
+    }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 14px 34px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: transform .15s, background .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--green); color: var(--white); box-shadow: 0 6px 18px rgba(63,174,63,.45); }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-outline { border: 2px solid var(--white); color: var(--white); }
+    .btn-outline:hover { background: rgba(255,255,255,.15); }
+    .hero-badge {
+      display: inline-block;
+      background: var(--red);
+      padding: 7px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* ---------- Sections ---------- */
+    section { padding: 70px 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-title {
+      text-align: center;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .section-title .accent { color: var(--green); }
+    .section-sub {
+      text-align: center;
+      color: #5a6b52;
+      max-width: 640px;
+      margin: 0 auto 44px;
+      font-size: 16px;
+    }
+
+    /* ---------- Gallery ---------- */
+    #gallery { background: var(--white); }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 26px;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,.1);
+      transition: transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e6efdf;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+    .card-img { position: relative; height: 210px; overflow: hidden; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .card:hover .card-img img { transform: scale(1.07); }
+    .price-tag {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: var(--green);
+      color: var(--white);
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+    .card-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .card-body h3 { font-size: 19px; font-weight: 700; }
+    .card-body .loc { color: #5a6b52; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+    .card-body .price-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .card-body .kshs { font-size: 13px; color: #5a6b52; font-weight: 600; }
+    .card-body .price { color: var(--green); font-weight: 800; font-size: 24px; }
+    .card-cta {
+      margin-top: 12px;
+      text-align: center;
+      background: var(--light);
+      border: 2px solid var(--green);
+      color: var(--green-deep);
+      padding: 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: background .2s, color .2s;
+    }
+    .card-cta:hover { background: var(--green); color: var(--white); }
+    .thumbs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .thumbs img {
+      width: 54px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color .15s, transform .15s;
+    }
+    .thumbs img:hover { transform: scale(1.06); }
+    .thumbs img.active { border-color: var(--green); }
+
+    /* ---------- Map ---------- */
+    #location { background: var(--light); }
+    .map-wrap {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.15);
+      border: 1px solid #dcead2;
+    }
+    #map { height: 480px; width: 100%; z-index: 1; }
+    .map-pin-logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid var(--white);
+      box-shadow: 0 3px 10px rgba(0,0,0,.4);
+      object-fit: cover;
+    }
+    .map-caption {
+      margin-top: 16px;
+      text-align: center;
+      color: #5a6b52;
+      font-size: 15px;
+    }
+    .map-caption strong { color: var(--green-deep); }
+    .map-legend {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 500;
+      background: rgba(255,255,255,.94);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .map-legend .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--red); border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,.2); }
+
+    /* ---------- Footer ---------- */
+    footer { background: var(--dark); color: var(--white); padding: 46px 20px 110px; }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+    }
+    .footer-brand img { height: 56px; margin: 0 auto 6px; border-radius: 6px; }
+    .footer-tagline { color: #b9d9b9; font-size: 15px; max-width: 560px; }
+    .socials { display: flex; gap: 18px; margin-top: 6px; }
+    .socials a {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.08);
+      transition: background .2s, transform .2s;
+    }
+    .socials a:hover { background: var(--green); transform: translateY(-3px); }
+    .socials svg { width: 24px; height: 24px; fill: var(--white); }
+    .social-handle { font-weight: 600; color: #cfe8cf; }
+    .footer-contact { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; margin-top: 4px; font-size: 15px; }
+    .footer-contact a { color: #eafaea; font-weight: 600; }
+    .footer-contact a:hover { color: #7ee87e; }
+    .copyright { font-size: 13px; color: #8aa88a; margin-top: 8px; }
+
+    /* ---------- Floating buttons ---------- */
+    .float-btn {
+      position: fixed;
+      bottom: 26px;
+      z-index: 2000;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      transition: transform .15s;
+    }
+    .float-btn:hover { transform: scale(1.1); }
+    .float-btn svg { width: 32px; height: 32px; fill: currentColor; }
+    .whatsapp { right: 26px; background: #25d366; }
+    .call { left: 26px; background: var(--green); }
+    .float-label {
+      position: absolute;
+      bottom: 70px;
+      white-space: nowrap;
+      background: rgba(20,33,15,.85);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity .2s;
+      pointer-events: none;
+    }
+    .whatsapp .float-label { right: 0; }
+    .call .float-label { left: 0; }
+    .float-btn:hover .float-label { opacity: 1; }
+
+    @media (max-width: 640px) {
+      .brand img { height: 46px; }
+      .header-phone span { display: none; }
+      .header-phone { padding: 10px 12px; }
+      #map { height: 360px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Username Estate Properties home">
+        <img src="assets/main-logo.jpeg" alt="Username Estate Properties logo">
+      </a>
+      <a class="header-phone" href="tel:0742674709">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+        <span>0742 674 709</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top">
+    <div class="hero-content">
+      <span class="hero-badge">1/8 ACRE PLOTS</span>
+      <h1>Own Land in Kenya's <span>Fastest-Growing</span> Estates</h1>
+      <p>Value-added plots in Nakuru, Ngong, Kikuyu, Juja, Kamakis &amp; Matuu — ready title deeds, developed infrastructure, flexible payment plans.</p>
+      <div class="hero-actions">
+        <a href="#gallery" class="btn btn-primary">View Projects &amp; Prices</a>
+        <a href="#location" class="btn btn-outline">See Location Map</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY ================= -->
+  <section id="gallery">
+    <div class="container">
+      <h2 class="section-title">Our <span class="accent">Projects</span></h2>
+      <p class="section-sub">Value-added 1/8 acre plots across Kenya — every project comes with a ready title deed and developed roads, water and electricity.</p>
+      <div class="gallery-grid" id="galleryGrid"><!-- cards injected by script.js --></div>
+    </div>
+  </section>
+
+  <!-- ================= LOCATION MAP ================= -->
+  <section id="location">
+    <div class="container">
+      <h2 class="section-title">Find Us in <span class="accent">Nakuru Grove Gardens</span></h2>
+      <p class="section-sub">Located in the fast-growing Bahati area, just 10 minutes' drive off the Nakuru–Nyeri highway.</p>
+      <div class="map-wrap">
+        <div class="map-legend"><span class="dot"></span> Nakuru Grove Gardens Phase 2</div>
+        <div id="map"></div>
+      </div>
+      <p class="map-caption">📍 <strong>Nakuru Grove Gardens Phase 2</strong> — Bahati, Nakuru County, Kenya.
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=-0.2275,36.1456" target="_blank" rel="noopener" style="color:var(--green-deep);font-weight:700;">Open in Google Maps →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <a class="footer-brand" href="#top">
+        <img src="assets/main-logo.jpeg" alt="Username Estate Properties">
+      </a>
+      <p class="footer-tagline">Prime value-added land across Kenya. Your journey to owning a plot starts here.</p>
+      <div class="socials">
+        <a href="https://facebook.com/UsernameProperties" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.91 3.78-3.91 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z"/></svg>
+        </a>
+        <a href="https://instagram.com/UsernameProperties" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Zm0 5.68a4.16 4.16 0 1 0 0 8.32 4.16 4.16 0 0 0 0-8.32Zm0 6.86a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4Zm5.3-7.03a.97.97 0 1 1-1.94 0 .97.97 0 0 1 1.94 0Z"/></svg>
+        </a>
+        <a href="https://tiktok.com/@UsernameProperties" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.9 2.9 0 1 1-2.03-2.77V9.4a6.33 6.33 0 1 0 5.48 6.27V8.7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.13Z"/></svg>
+        </a>
+        <a href="https://x.com/UsernameLtd" target="_blank" rel="noopener" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z"/></svg>
+        </a>
+      </div>
+      <div class="social-handle">Facebook • Instagram • TikTok: UsernameProperties &nbsp;|&nbsp; X: @UsernameLtd</div>
+      <div class="footer-contact">
+        <a href="tel:0742674709">📞 0742 674 709</a>
+        <a href="https://wa.me/254742674709" target="_blank" rel="noopener">💬 WhatsApp Us</a>
+      </div>
+      <p class="copyright">© 2026 Username Estate Properties. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ================= FLOATING BUTTONS ================= -->
+  <a class="float-btn whatsapp" href="https://wa.me/254742674709" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.58-.09 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35ZM12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.9-9.88a9.83 9.83 0 0 1 7 2.9 9.83 9.83 0 0 1 2.89 7c0 5.45-4.44 9.87-9.9 9.87Zm8.42-18.3A11.8 11.8 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.9c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.9 11.9 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.18-1.24-6.16-3.47-8.41Z"/></svg>
+    <span class="float-label">Chat with us</span>
+  </a>
+  <a class="float-btn call" href="tel:0742674709" aria-label="Call us">
+    <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+    <span class="float-label">Call 0742 674 709</span>
+  </a>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="script.js"></script>
+</body>
+</html>
