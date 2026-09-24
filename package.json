@@ -1,0 +1,14 @@
+{
+  "name": "username-estate-properties",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Username Estate Properties — Cloudflare Workers deployment for the real estate landing page",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

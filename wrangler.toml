@@ -1,0 +1,11 @@
+name = "username-estate-properties"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+account_id = "0259edb22a062c1a3b30116689e69502"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[observability]
+enabled = true
