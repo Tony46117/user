@@ -37,9 +37,10 @@ export default {
       return new Response("ok", { status: 200, headers: { "Cache-Control": "no-store" } });
     }
 
-    // Serve the asset (or index.html for "/")
-    const assetRequest = new Request(url.origin + (url.pathname === "/" ? "/index.html" : url.pathname), request);
-    const assetResponse = await env.ASSETS.fetch(assetRequest);
+    // Serve the asset as-requested. The assets layer natively serves
+    // index.html for "/" — rewriting "/" to "/index.html" here would
+    // trigger its trailing-slash normalization back to "/" (redirect loop).
+    const assetResponse = await env.ASSETS.fetch(request);
 
     if (assetResponse.status === 404) {
       // Clean 404: redirect unknown paths to the landing page (keeps SEO equity)
