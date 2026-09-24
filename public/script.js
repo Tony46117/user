@@ -144,7 +144,7 @@ const pinIcon = L.divIcon({
   html: `
     <div style="position:relative;transform:translate(-50%,-100%);width:64px;">
       <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:26px solid #e02b2b;margin:0 auto;"></div>
-      <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.4);overflow:hidden;background:#fff;">
+      <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:56px;height:56px;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.4);overflow:hidden;background:#fff;">
         <img src="assets/map-logo.jpeg" alt="Nakuru Grove Gardens" style="width:100%;height:100%;object-fit:cover;">
       </div>
     </div>
